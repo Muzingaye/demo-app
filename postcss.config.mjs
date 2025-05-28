@@ -1,6 +1,7 @@
 import colors from "tailwindcss/colors";
 
 const config = {
+
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
@@ -11,7 +12,7 @@ const config = {
     extend: {
       colors: {
         brand: {
-          DEFAULT: "#7FFF00",
+          DEFAULT: "#8B0000",
           100: "#ADFF2F",
         },
         blue: "#0000FF",

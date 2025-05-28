@@ -40,11 +40,11 @@ export const createAccount = async ({
   password: string;
 }) => {
   console.log("Testing request");
-  // const existingUser = await getUserByEmail(email);
-  // if (!existingUser) {
-  //   // use an api to register the user
-  //   throw new Error("User not found");
-  // }
+  const existingUser = await getUserByEmail(email);
+  if (!existingUser) {
+    // use an api to register the user
+    throw new Error("User not found");
+  }
   // const accId = await sendEmailOTP(email);
 
   // if (!accId) {
