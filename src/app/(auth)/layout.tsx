@@ -7,21 +7,26 @@ const Layout =  async ({ children }: { children: React.ReactNode }) => {
   let isError = false;
   try{
     const res = await fetch(app_config.api_base_url, {method: "HEAD"});
-
     if(!res.ok){
        isError = true;
     }
-
-   
   } catch(error) {
-
+    console.log(error);
   }
   return (
     <div className="flex min-h-screen">
       <section className="bg-green-300 p-10 hidden w-1/2 items-center justify-center lg:flex xl:w-3/5">
-        { isError && (
-        <h1>{isError ? ' API Status: Checking...' : isError ? '' : '❌ Down'}</h1> )}
-        
+       
+        <h1>API Status: {isError == false ? 'Checking...' : isError ? '' : '❌ Down'}</h1>
+           {isError && (
+                        <Image
+                          src="./images/loading.svg"
+                          alt="Loading"
+                          width={24}
+                          height={24}
+                          // className="animate-spin"
+                        />
+                      )}
         <div className="flex max-h-[800px] max-w-[430px] flex-col justify-center space-y-12">
           <Image
             src="/images/logo.svg"

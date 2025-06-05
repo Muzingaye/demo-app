@@ -1,6 +1,6 @@
 export const navItems = [
     { name: "Dashboard", icon: "./images/dashboard.svg", url: "/" },
-    { name: "Documents", icon: "./images/documents.svg", url: "/documents" },
+    { name: "Documents", icon: "./images/documents.svg", url: "/posts" },
     { name: "Images", icon: "./images//images.svg", url: "/images" },
     { name: "Media", icon: "/./images//media.svg", url: "/media" },
     { name: "Others ", icon: "./images/others.svg", url: "/others" }

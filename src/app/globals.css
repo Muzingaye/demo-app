@@ -11,7 +11,7 @@
   --brand: red;
 }
 .main-content {
-  @apply flex flex-col items-center justify-center h-screen bg-gray-950;
+  @apply flex flex-col items-center justify-center h-screen;
 }
 
 

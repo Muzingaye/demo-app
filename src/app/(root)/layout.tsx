@@ -1,44 +1,41 @@
-'use client'
-import React from "react";
+import React, { use } from "react";
 import SideBar from "../components/Sidebar";
-import MobileNavigation from "../components/MobileNavigation";
 import Header from "../components/Header";
-import { redirect, useSearchParams } from "next/navigation";
+import { redirect } from "next/navigation";
 import { avatarUrl } from "@/constants";
+import { cookies } from "next/headers";
+import { getCurrentUser, User } from "../libs";
 
-type User = {
-  id: number;
-  fullname: string;
-  email: string;
-  avatar: string;
-};
-const Layout = async ({ children }: { children: React.ReactNode }) => {
-  
-  const params = useSearchParams();
-  const id  =   params.get("id");
-  const name = params.get("fullname");
-  const email = params.get("email");
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const access_token = (await cookies()).get("access_token")?.value;
+  if (!access_token) {
+    console.log("No access token found, redirecting");
+    return redirect("/sign-in");
+  }
+  const user = await getCurrentUser(access_token as string);
+  if (!user) {
+    return redirect("/sign-in");
+  }
   const currUser: User = {
-    id: Number(id) || 0,
-    fullname: name || "",
-    email: email || "",
-    avatar: avatarUrl,
+    id: user.id,
+    fullname: user.name,
+    email: user.email,
+    avatar: false || avatarUrl,
   };
 
-  if (currUser.id === 0) {
-    redirect("/sign-in");
-  }
   return (
     <main className="container flex h-screen">
       <SideBar {...currUser} />
       <section className="flex h-full flex-1 flex-col">
-        <MobileNavigation />
-        <Header />
+        {/* <MobileNavigation /> */}
+        <Header userId={currUser.id.toString()} />
 
         <div className="main-content">{children}</div>
       </section>
     </main>
   );
-};
-
-export default Layout;
+}

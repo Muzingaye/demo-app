@@ -1,5 +1,5 @@
 "use client";
-import React, { SyntheticEvent, useState, useEffect } from "react";
+import React, { SyntheticEvent, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { app_config } from "../libs/config";
@@ -10,11 +10,9 @@ type FormType = "sign-in" | "sign-up";
 export default function AuthForm({ type }: { type: FormType }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState("");
-  const [accId, setAccId] = useState("");
-  const [showModal, setShowModal] = useState(false);
+  const [id, setId] = useState("");
 
   async function onSubmit(e: SyntheticEvent) {
     e.preventDefault();
@@ -29,29 +27,27 @@ export default function AuthForm({ type }: { type: FormType }) {
     try {
       const res = await fetch(`${build_url}`, {
         method: "POST",
+        credentials: 'include',
         headers: {
           "Content-Type": "application/json",
           "X-App-Project": app_config.api_project_id,
-          "X-App-Mode": name ? "admin" : accId,
-          "X-App-Endpoint": app_config.api_base_url,
           "X-App-API-Key": app_config.api_key,
         },
         body: JSON.stringify({
           name: name ? name : "",
           email: email,
-          // password: password,
         }),
       });
 
       if (res.ok) {
         const user = await res.json();
-        setAccId(user?.id);
+        setId(user?.id);
       } else {
         const errorData = await res.text();
         setIsError(errorData);
       }
     } catch (error) {
-      setIsError("Failed to create account");
+      setIsError(`${error}`);
     } finally {
       setIsLoading(false);
     }
@@ -138,7 +134,7 @@ export default function AuthForm({ type }: { type: FormType }) {
             </div>
           </form>
 
-          {accId && <OptModal email={email} accId={accId} />}
+          {id && <OptModal email={email} id={id} />}
         </main>
       </div>
     </>

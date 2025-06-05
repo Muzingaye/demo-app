@@ -1,11 +1,12 @@
 "use client";
-import { use, useState, SyntheticEvent } from "react";
+import { useState, SyntheticEvent } from "react";
 import OtpInput from "./OtpInput";
 import { useRouter } from "next/navigation";
 import { app_config } from "../libs/config";
+import Image from "next/image";
 
-const OptModal = ({ email, accId }: { email: string; accId: string }) => {
-  const [isOpen, setIsOpen] = useState(true);
+const OptModal = ({ email, id }: { email: string; id: string }) => {
+  // const [isOpen, setIsOpen] = useState(true);
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState("");
@@ -14,6 +15,7 @@ const OptModal = ({ email, accId }: { email: string; accId: string }) => {
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    // isError = "";
     const url = app_config.api_base_url + "/auth/login";
     try {
       const resp = await fetch(`${url}`, {
@@ -25,26 +27,21 @@ const OptModal = ({ email, accId }: { email: string; accId: string }) => {
           API_KEY: app_config.api_key,
         },
         body: JSON.stringify({
+          id: id,
           email: email,
           otp: otp.join(""),
         }),
       });
 
       if (resp.ok) {
-        const data = await resp.json();
-        if (data.id) {
-          router.push(
-            `/?id=${encodeURIComponent(data.id)}&fullname=${encodeURIComponent(data.fullname)}&email=${encodeURIComponent(data.email)}`
-          );
-        }
+        router.push("/");
       } else {
-        const errorData = await resp.text();
+        const errorData = await resp.json().catch(() => null);
         console.error("Error response:", errorData);
         setIsError(errorData);
       }
     } catch (err) {
       setIsError(`Failed to create account: ${err}`);
-      console.error("Error submitting OTP:", err);
     }
 
     setIsLoading(false);
@@ -56,15 +53,15 @@ const OptModal = ({ email, accId }: { email: string; accId: string }) => {
     try {
       console.log("Resending OTP");
     } catch (err) {
-      console.error("Error resending OTP:", err);
+      setIsError(`Failed to create account: ${err}`);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const onClose = async () => {
     setOtp(Array(6).fill(""));
-    setIsOpen(false);
+    //setIsOpen(false);
   };
   return (
     <>
@@ -87,11 +84,28 @@ const OptModal = ({ email, accId }: { email: string; accId: string }) => {
           </p>
           <OtpInput value={otp} onChange={setOtp} />
           <div style={{ marginTop: "20px" }}>
-            <button onClick={handleSubmit}>Submit</button>
+            <button onClick={handleSubmit}>
+              Submit
+              {isLoading && (
+                <Image
+                  src="./images/loading.svg"
+                  alt="Loading"
+                  width={24}
+                  height={24}
+                  className="animate-spin"
+                />
+              )}
+            </button>
             <button onClick={onClose} style={{ marginLeft: "10px" }}>
               Cancel
             </button>
+
+            <button onClick={handleResendOtp} style={{ marginLeft: "10px" }}>
+              Resend OTP
+            </button>
           </div>
+
+          {isError && <p className="text-danger error-message">{isError}</p>}
         </div>
         <style jsx>{`
           .modal-backdrop {

@@ -1,48 +1,33 @@
 "use server";
-
-import { Account, Storage, Client,Avatars, Databases } from "node-appwrite";
 import { app_config } from "./config";
-import { cookies } from "next/headers";
-export const createSessionClient = async () => {
-  const client = new Client()
-    .setEndpoint(app_config.api_base_url)
-    .setProject(app_config.api_project_id)
-    .setKey(app_config.api_key);
 
-  const session = (await cookies()).get("appwrite_session");
-
-  if (!session || !session) throw new Error("Session not found");
-
-  client.setEndpoint(session.value);
-
-  return {
-    get account() {
-      return new Account(client);
-    },
-
-    get databases() {
-      return new Databases(client);
-    },
-  };
+export type User = {
+  id: number;
+  fullname: string;
+  email: string;
+  avatar: string;
 };
 
-export const createAdminClient = async () => {
-  const client = new Client()
-    .setEndpoint(app_config.api_base_url)
-    .setProject(app_config.api_project_id)
-    .setKey(app_config.api_key);
+ export async function getCurrentUser(token: string) {
+   try {
+    console.log("access-token: ", token);
+     const res = await fetch(`${app_config.api_base_url}/auth/verify_me`, {
+       method: "GET",
+      credentials: 'include',
+       headers: {
+         Authorization: `Bearer ${token}`,
+       },
+       cache: "no-store",
+     });
 
-  return {
-    get account() {
-      return new Account(client);
-    },
+     if (!res.ok) {
+       console.log(`Failed  to very user: ${res.status}`);
+       return null;
+     }
 
-    get storage() {
-      return new Storage(client);
-    },
-
-    get avatars() {
-    return new Avatars(client);
-    },
-  };
-};
+     return await res.json();
+   } catch (err) {
+     console.log("failed to fetch users", err);
+     return null;
+   }
+ }
