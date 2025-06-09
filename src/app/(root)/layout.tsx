@@ -13,7 +13,6 @@ export default async function Layout({
 }) {
   const access_token = (await cookies()).get("access_token")?.value;
   if (!access_token) {
-    console.log("No access token found, redirecting");
     return redirect("/sign-in");
   }
   const user = await getCurrentUser(access_token as string);
@@ -32,7 +31,7 @@ export default async function Layout({
       <SideBar {...currUser} />
       <section className="flex h-full flex-1 flex-col">
         {/* <MobileNavigation /> */}
-        <Header userId={currUser.id.toString()} />
+        <Header access_token={access_token} />
 
         <div className="main-content">{children}</div>
       </section>

@@ -10,7 +10,6 @@ export type User = {
 
  export async function getCurrentUser(token: string) {
    try {
-    console.log("access-token: ", token);
      const res = await fetch(`${app_config.api_base_url}/auth/verify_me`, {
        method: "GET",
       credentials: 'include',
